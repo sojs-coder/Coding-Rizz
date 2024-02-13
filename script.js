@@ -232,9 +232,9 @@ function drawvalentineButtons() {
         var y = yesButton.y + yesButton.height / 2;
 
         var timeOver = performance.now() - grow_buttonStartedAt;
-        var endTime = grow_buttonStartedAt + 1500;
+        var endTime = grow_buttonStartedAt + 1000;
         var timeLeft = endTime - timeOver;
-        var percent = timeOver / 1500;
+        var percent = timeOver / 1000;
 
         var targetRadius = canvas.width / 2;
         var radius = targetRadius * percent;
@@ -243,19 +243,56 @@ function drawvalentineButtons() {
         ctx.arc(x, y, radius, 0, Math.PI * 2);
         ctx.fillStyle = yesButton.color;
         ctx.fill();
+        if(confettiParticles.length < 100 && Math.random() > 0.9){
+            confettiParticles.push(new ConfettiParticle(randInRange(0, canvas.width), themeColors[Math.floor(Math.random() * themeColors.length)]));
+        }
+  
         if (timeOver > 1500) {
             layer3 = "show text";
         }
+        confettiParticles = confettiParticles.filter(particle => {
+            if(particle.y > canvas.height){
+                return false;
+            } else {
+                return true;
+            }
+        });
     }
     if(layer3 == "show text"){
         ctx.font = "bold 100px Arial";
         ctx.textAlign = "center";
         ctx.fillStyle = "#FFF";
         ctx.fillText("Yay!", canvas.width / 2, canvas.height / 2 - 150);
-        ctx.fillText("😘", canvas.width / 2, canvas.height / 2)
+        ctx.fillText("😘", canvas.width / 2, canvas.height / 2);
+        
+    }
+    if(layer2 == "grow_button"){
+        confetti();
     }
 }
-
+var confettiParticles = [];
+class ConfettiParticle {
+    constructor(x, color) {
+        this.x = x;
+        this.y = -10;
+        this.color = color;
+        this.angle = Math.random() * Math.PI * 2;
+    }
+    draw() {
+        this.y += 3;
+        this.x += Math.sin(this.angle) * 2;
+        this.angle += 0.1;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, 5, 0, Math.PI * 2);
+        ctx.fillStyle = this.color;
+        ctx.fill();
+    }
+}
+function confetti(){
+    confettiParticles.forEach(particle => {
+        particle.draw();
+    });
+}
 var heyTextTopOffSet = 0;
 var heyTextMaxOffSet = 150;
 var heyX = canvas.width / 2;
